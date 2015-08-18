@@ -23,8 +23,7 @@
 		[SetUp]
 		public void Setup()
 		{
-			//Database.SetInitializer(new DropCreateDatabaseAlways<MyDbContext>());
-			Database.SetInitializer(new CreateDatabaseIfNotExists<MyDbContext>());
+			Database.SetInitializer(new DropCreateDatabaseAlways<MyDbContext>());
 		}
 
 		[Test]
