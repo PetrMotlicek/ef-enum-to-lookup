@@ -2,14 +2,12 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using System.ComponentModel;
 	using System.Data.Entity;
 	using System.Data.Entity.Infrastructure;
 	using System.Data.SqlClient;
 	using System.Linq;
 	using System.Reflection;
 	using System.Text;
-	using System.Text.RegularExpressions;
 
 	/// <summary>
 	/// Makes up for a missing feature in Entity Framework 6.1
@@ -31,6 +29,7 @@
 		{
 			// set default behaviour, can be overridden by setting properties on object before calling Apply()
 			NameFieldLength = 255;
+			DescriptionFieldLength = 255;
 			TableNamePrefix = "Enum_";
 			_enumParser = new EnumParser { SplitWords = true };
 		}
@@ -50,6 +49,12 @@
 		/// Adjust to suit your data if required, defaults to 255.
 		/// </summary>
 		public int NameFieldLength { get; set; }
+
+		/// <summary>
+		/// The size of the Desription field that will be added to the generated lookup tables.
+		/// Adjust to suit your data if required, defaults to 255.
+		/// </summary>
+		public int DescriptionFieldLength { get; set; }
 
 		/// <summary>
 		/// Prefix to add to all the generated tables to separate help group them together
@@ -110,8 +115,9 @@
 			IDbHandler dbHandler = new SqlServerHandler
 			{
 				NameFieldLength = NameFieldLength,
+				DescriptionFieldLength = DescriptionFieldLength,
 				TableNamePrefix = TableNamePrefix,
-				TableNameSuffix = TableNameSuffix,
+				TableNameSuffix = TableNameSuffix
 			};
 			return dbHandler;
 		}
@@ -166,16 +172,14 @@
 		internal IList<PropertyInfo> FindDbSets(Type contextType)
 		{
 			return contextType.GetProperties()
-				.Where(p => p.PropertyType.IsGenericType
-										&& p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+				.Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
 				.ToList();
 		}
 
 		internal IList<PropertyInfo> FindEnums(Type type)
 		{
 			return type.GetProperties()
-				.Where(p => p.PropertyType.IsEnum
-										|| (p.PropertyType.IsGenericType && p.PropertyType.GenericTypeArguments.First().IsEnum))
+				.Where(p => p.PropertyType.IsEnum || (p.PropertyType.IsGenericType && p.PropertyType.GenericTypeArguments.First().IsEnum))
 				.ToList();
 		}
 	}

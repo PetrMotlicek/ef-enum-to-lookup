@@ -1,15 +1,15 @@
-﻿using System.ComponentModel;
-
-namespace EfEnumToLookupTests.Model
+﻿namespace EfEnumToLookupTests.Model
 {
+	using System.ComponentModel.DataAnnotations;
+
 	public enum Importance
 	{
 		Bovverd = 1,
-
-		[Description(Constants.AintBovveredDisplay)]
+		
+		[Display(Description = Constants.AintBovveredDescription)]
 		AintBovverd,
-
-		[Description(Constants.BovveredDisplay)]
+		
+		[Display(Description = Constants.BovveredDescription)]
 		NotBovverd
 	}
 }

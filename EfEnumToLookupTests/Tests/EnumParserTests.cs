@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using EfEnumToLookup.LookupGenerator;
-using NUnit.Framework;
-
-namespace EfEnumToLookupTests.Tests
+﻿namespace EfEnumToLookupTests.Tests
 {
+	using System.ComponentModel.DataAnnotations;
+	using System.Linq;
+	using EfEnumToLookup.LookupGenerator;
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class EnumParserTests
 	{
@@ -14,10 +15,10 @@ namespace EfEnumToLookupTests.Tests
 			var parser = new EnumParser { SplitWords = false };
 
 			// act
-			var result = parser.GetLookupValues(typeof(BareEnum));
+			var lookupValue = parser.GetLookupValues(typeof(BareEnum)).Single();
 
 			// assert
-			Assert.AreEqual("FooBar", result.Single().Name);
+			Assert.AreEqual("FooBar", lookupValue.Name);
 		}
 
 		[Test]
@@ -27,10 +28,10 @@ namespace EfEnumToLookupTests.Tests
 			var parser = new EnumParser { SplitWords = true };
 
 			// act
-			var result = parser.GetLookupValues(typeof(BareEnum));
+			var lookupValue = parser.GetLookupValues(typeof(BareEnum)).Single();
 
 			// assert
-			Assert.AreEqual("Foo Bar", result.Single().Name);
+			Assert.AreEqual("Foo Bar", lookupValue.Name);
 		}
 
 		[Test]
@@ -40,12 +41,11 @@ namespace EfEnumToLookupTests.Tests
 			var parser = new EnumParser { SplitWords = false };
 
 			// act
-			var result = parser.GetLookupValues(typeof(ByteEnum));
+			var lookupValue = parser.GetLookupValues(typeof(ByteEnum)).Single();
 
 			// assert
-			Assert.AreEqual("FooBar", result.Single().Name);
+			Assert.AreEqual("FooBar", lookupValue.Name);
 		}
-
 
 		[Test]
 		public void ReadsDecoratedName()
@@ -54,10 +54,51 @@ namespace EfEnumToLookupTests.Tests
 			var parser = new EnumParser { SplitWords = true };
 
 			// act
-			var result = parser.GetLookupValues(typeof(DecoratedEnum));
+			var lookupValue = parser.GetLookupValues(typeof(NameDecoratedEnum)).Single();
 
 			// assert
-			Assert.AreEqual("Wide boy", result.Single().Name);
+			Assert.AreEqual("Wide boy", lookupValue.Name);
+		}
+
+		[Test]
+		public void ReadsDecoratedDescription()
+		{
+			// arrange
+			var parser = new EnumParser { SplitWords = true };
+
+			// act
+			var lookupValue = parser.GetLookupValues(typeof(DescriptionDecoratedEnum)).Single();
+
+			// assert
+			Assert.AreEqual("Wide boy description", lookupValue.Description);
+		}
+
+		[Test]
+		public void ReadsDecoratedNameAndDescription()
+		{
+			// arrange
+			var parser = new EnumParser { SplitWords = true };
+
+			// act
+			var lookupValue = parser.GetLookupValues(typeof(NameAndDescriptionDecoratedEnum)).Single();
+
+			// assert
+			Assert.AreEqual("Wide boy", lookupValue.Name);
+			Assert.AreEqual("Wide boy description", lookupValue.Description);
+		}
+
+		[Test]
+		public void ReadsDecoratedNameAndNullDescription()
+		{
+			// arrange
+			var parser = new EnumParser { SplitWords = false };
+
+			// act
+			var lookupValue = parser.GetLookupValues(typeof(NameDecoratedEnum)).Single();
+
+			// assert
+			Assert.AreEqual("Wide boy", lookupValue.Name);
+			Assert.AreEqual(null, lookupValue.Description);
 		}
 
 		private enum BareEnum
@@ -74,12 +115,27 @@ namespace EfEnumToLookupTests.Tests
 			FooBar
 		}
 
-		private enum DecoratedEnum
+		private enum NameDecoratedEnum
 		{
 			// ReSharper disable once UnusedMember.Local
 			// used by test suite
-			[System.ComponentModel.Description("Wide boy")]
-			FooBar
+			[Display(Name = "Wide boy")]
+			FooBar,
+		}
+
+		private enum DescriptionDecoratedEnum
+		{
+			// ReSharper disable once UnusedMember.Local
+			// used by test suite
+			[Display(Description = "Wide boy description")]
+			FooBar,
+		}
+		private enum NameAndDescriptionDecoratedEnum
+		{
+			// ReSharper disable once UnusedMember.Local
+			// used by test suite
+			[Display(Name = "Wide boy", Description = "Wide boy description")]
+			FooBar,
 		}
 	}
 }

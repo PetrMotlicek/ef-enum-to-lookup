@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-
 namespace EfEnumToLookup.LookupGenerator
 {
+	using System;
+	using System.Collections.Generic;
+	using System.ComponentModel.DataAnnotations;
+	using System.Linq;
+	using System.Reflection;
+	using System.Text.RegularExpressions;
+
 	/// <summary>
 	/// Loops through the values in an enum type and gets the ids and names
 	/// for use in the generated lookup table.
@@ -57,6 +57,7 @@ namespace EfEnumToLookup.LookupGenerator
 				{
 					Id = (int)numericValue,
 					Name = EnumName(value),
+					Description = EnumDescriptionValue(value)
 				});
 			}
 			return values;
@@ -70,18 +71,13 @@ namespace EfEnumToLookup.LookupGenerator
 		/// </summary>
 		private string EnumName(Enum value)
 		{
-			var description = EnumDescriptionValue(value);
-			if (description != null)
-			{
-				return description;
-			}
-
-			var name = value.ToString();
+			var name = EnumNameValue(value).ToString();
 
 			if (SplitWords)
 			{
 				return SplitCamelCase(name);
 			}
+
 			return name;
 		}
 
@@ -89,12 +85,50 @@ namespace EfEnumToLookup.LookupGenerator
 		{
 			// http://stackoverflow.com/questions/773303/splitting-camelcase/25876326#25876326
 			name = Regex.Replace(name, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled);
+
 			return name;
 		}
 
 		/// <summary>
-		/// Returns the value of the DescriptionAttribute for an enum value,
+		/// Returns the Name from DisplayAttribute for an enum value,
+		/// or Name of the enum value.
+		/// <example>
+		/// <code>
+		/// public enum Shape
+		/// {
+		///		[Display(Name = "Rounded", Description = "Round it is!")]
+		///		Round
+		/// }
+		/// </code>
+		/// 
+		/// Will return Rounded as Name
+		/// </example>
+		/// </summary>
+		private static string EnumNameValue(Enum value)
+		{
+			var enumType = value.GetType();
+
+			// https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value/1799401#1799401
+			var member = enumType.GetMember(value.ToString()).First();
+			var name = member.GetCustomAttributes(typeof(DisplayAttribute)).FirstOrDefault() as DisplayAttribute;
+
+			return name == null || string.IsNullOrWhiteSpace(name.Name) ? value.ToString() : name.Name;
+		}
+
+		/// <summary>
+		/// Returns the Description from DisplayAttribute for an enum value,
 		/// or null if there isn't one.
+		/// /// <example>
+		/// <code>
+		/// public enum Shape
+		/// {
+		///		[Display(Name = "Rounded", Description = "Round it is!")]
+		///		Round
+		/// }
+		/// </code>
+		/// 
+		/// Will return Round it is! as Description
+		/// </example>
 		/// </summary>
 		private static string EnumDescriptionValue(Enum value)
 		{
@@ -102,7 +136,8 @@ namespace EfEnumToLookup.LookupGenerator
 
 			// https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value/1799401#1799401
 			var member = enumType.GetMember(value.ToString()).First();
-			var description = member.GetCustomAttributes(typeof(DescriptionAttribute)).FirstOrDefault() as DescriptionAttribute;
+			var description = member.GetCustomAttributes(typeof(DisplayAttribute)).FirstOrDefault() as DisplayAttribute;
+
 			return description == null ? null : description.Description;
 		}
 
@@ -112,6 +147,7 @@ namespace EfEnumToLookup.LookupGenerator
 
 			// https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value/1799401#1799401
 			var member = enumType.GetMember(value.ToString()).First();
+
 			return member.GetCustomAttributes(typeof(RuntimeOnlyAttribute)).Any();
 		}
 	}

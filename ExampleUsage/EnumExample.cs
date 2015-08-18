@@ -1,10 +1,11 @@
-﻿using System;
-using System.Data.Entity;
-using EfEnumToLookup.LookupGenerator;
-using NUnit.Framework;
-
-namespace ExampleUsage
+﻿namespace ExampleUsage
 {
+	using System;
+	using System.ComponentModel.DataAnnotations;
+	using System.Data.Entity;
+	using EfEnumToLookup.LookupGenerator;
+	using NUnit.Framework;
+	
 	/// <summary>
 	/// Example usage of the ef lookup generator.
 	/// To see the library in action create a project for this example cs
@@ -22,7 +23,8 @@ namespace ExampleUsage
 		[SetUp]
 		public void Setup()
 		{
-			Database.SetInitializer(new DropCreateDatabaseAlways<MyDbContext>());
+			//Database.SetInitializer(new DropCreateDatabaseAlways<MyDbContext>());
+			Database.SetInitializer(new CreateDatabaseIfNotExists<MyDbContext>());
 		}
 
 		[Test]
@@ -32,6 +34,7 @@ namespace ExampleUsage
 			{
 				var enumToLookup = new EnumToLookup();
 				enumToLookup.NameFieldLength = 42; // optional, example of how to override default values
+				enumToLookup.DescriptionFieldLength = 250; // optional, example of how to override default values
 
 				// This would normally be run inside either a db initializer Seed()
 				// or the migration Seed() method which both provide access to a context.
@@ -39,7 +42,8 @@ namespace ExampleUsage
 			}
 		}
 
-		[Test] public void ExampleOfGeneratingSql()
+		[Test]
+		public void ExampleOfGeneratingSql()
 		{
 			using (var context = new MyDbContext())
 			{
@@ -80,25 +84,24 @@ namespace ExampleUsage
 	/// </summary>
 	public enum Size
 	{
-		Small = 1, //db friendly id
+		[RuntimeOnly] // this won't exist in the database, handy to prevent unwanted data creeping in (enforced by foreign key constraint).
+		None = 0,
 
-		// this is only fully qualified because of a name clash with NUnit, you wouldn't normally need to.
-		[System.ComponentModel.Description("It's average")] // example of apostrophe that would need escaping in sql
+		Small = 1, //db friendly id
+		
+		[Display(Description = "It's average")] // example of apostrophe that would need escaping in sql
 		Medium,
 
 		ReallyVeryBig,
-
-		// this is only fully qualified because of a name clash with NUnit, you wouldn't normally need to.
-		[System.ComponentModel.Description("Huge you know?")] // give it a different name in the lookup table
-		Huge,
-
-		[RuntimeOnly] // this won't exist in the database, handy to prevent unwanted data creeping in (enforced by foreign key constraint).
-		Undecided
+		
+		Huge
 	}
 
 	public enum Shape
 	{
 		Square,
+
+		[Display(Name = "Rounded", Description = "Round it is!")]
 		Round
 	}
 }
