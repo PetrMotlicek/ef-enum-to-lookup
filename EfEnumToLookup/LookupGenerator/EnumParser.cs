@@ -33,13 +33,16 @@ namespace EfEnumToLookup.LookupGenerator
 		/// for use in the generated lookup table.
 		/// </summary>
 		/// <param name="lookup">Enum to process</param>
+		/// <param name="getDescriptions">Descriptions of enumeration members should be got out of <see cref="DescriptionAttribute"/> got, because it will be used for DB description column.</param>
 		/// <exception cref="System.ArgumentException">Lookup type must be an enum;lookup</exception>
-		public IEnumerable<LookupValue> GetLookupValues(Type lookup)
+		public ICollection<LookupValue> GetLookupValues(Type lookup, bool getDescriptions = false)
 		{
 			if (!lookup.IsEnum)
 			{
 				throw new ArgumentException("Lookup type must be an enum", "lookup");
 			}
+
+			var namesWithDescription = !getDescriptions;
 
 			var values = new List<LookupValue>();
 			foreach (Enum value in Enum.GetValues(lookup))
@@ -53,11 +56,18 @@ namespace EfEnumToLookup.LookupGenerator
 				// https://github.com/timabell/ef-enum-to-lookup/issues/20
 				var numericValue = Convert.ChangeType(value, typeof(int));
 
-				values.Add(new LookupValue
+				var lookupValue = new LookupValue
 				{
 					Id = (int)numericValue,
-					Name = EnumName(value),
-				});
+					Name = EnumName(value, !getDescriptions),
+				};
+
+				if (getDescriptions)
+				{
+					lookupValue.Description = EnumParser.EnumDescriptionValue(value);
+				}
+
+				values.Add(lookupValue);
 			}
 			return values;
 		}
@@ -68,15 +78,19 @@ namespace EfEnumToLookup.LookupGenerator
 		/// if available, otherwise will use the value's name, optionally
 		/// split into words.
 		/// </summary>
-		private string EnumName(Enum value)
+		private string EnumName(Enum value, bool preferDescription)
 		{
-			var description = EnumDescriptionValue(value);
-			if (description != null)
-			{
-				return description;
-			}
+			string name;
 
-			var name = value.ToString();
+			if (preferDescription)
+			{
+				name = EnumDescriptionValue(value) ?? value.ToString();
+			}
+			else
+			{
+				name = value.ToString();
+			}
+			
 
 			if (SplitWords)
 			{

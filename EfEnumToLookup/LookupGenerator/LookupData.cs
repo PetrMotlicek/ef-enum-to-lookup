@@ -9,7 +9,8 @@ namespace EfEnumToLookup.LookupGenerator
 	internal class LookupData
 	{
 		public string Name { get; set; }
-		public IEnumerable<LookupValue> Values { get; set; }
+		public ICollection<LookupValue> Values { get; set; }
 		public Type NumericType { get; set; }
+		public Type EnumType { get; set; }
 	}
 }

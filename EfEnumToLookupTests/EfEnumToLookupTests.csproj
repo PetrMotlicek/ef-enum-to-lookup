@@ -88,6 +88,7 @@
     <Compile Include="Tests\ModelParsingTests.cs" />
     <Compile Include="Tests\TestConfiguration.cs" />
     <Compile Include="Tests\TestStuff.cs" />
+    <Compile Include="Tests\TestStuffViews.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

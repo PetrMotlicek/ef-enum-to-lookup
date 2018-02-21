@@ -69,6 +69,15 @@
 		/// </summary>
 		public bool UseTransaction { get; set; }
 
+		/// <inheritdoc />
+		public string Schema { get; set; }
+
+		/// <inheritdoc />
+		public bool GenerateDescription { get; set; }
+
+		/// <inheritdoc />
+		public bool GenerateViews { get; set; }
+
 		/// <summary>
 		/// Create any missing lookup tables,
 		/// enforce values in the lookup tables
@@ -111,13 +120,23 @@
 		{
 			// todo: support MariaDb etc. Issue #16
 
-			IDbHandler dbHandler = new SqlServerHandler
+			IDbHandler dbHandler;
+			if (GenerateViews)
 			{
-				NameFieldLength = NameFieldLength,
-				TableNamePrefix = TableNamePrefix,
-				TableNameSuffix = TableNameSuffix,
-				UseTransaction = UseTransaction,
-			};
+				dbHandler = new SqlViewServerHandler();
+			}
+			else
+			{
+				dbHandler = new SqlServerHandler();
+			}
+
+			dbHandler.NameFieldLength = NameFieldLength;
+			dbHandler.TableNamePrefix = TableNamePrefix;
+			dbHandler.TableNameSuffix = TableNameSuffix;
+			dbHandler.UseTransaction = UseTransaction;
+			dbHandler.Schema = Schema;
+			dbHandler.GenerateDescription = GenerateDescription;
+
 			return dbHandler;
 		}
 
@@ -139,7 +158,8 @@
 				{
 					Name = enm.Name,
 					NumericType = enm.GetEnumUnderlyingType(),
-					Values = _enumParser.GetLookupValues(enm),
+					EnumType = enm,
+					Values = _enumParser.GetLookupValues(enm, GenerateDescription),
 				}).ToList();
 
 			var model = new LookupDbModel

@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 
 namespace EfEnumToLookup.LookupGenerator
 {
@@ -36,8 +37,35 @@ namespace EfEnumToLookup.LookupGenerator
 		string TableNamePrefix { get; set; }
 
 		/// <summary>
+		/// Suffix to add to all the generated tables to separate help group them together
+		/// and make them stand out as different from other tables.
+		/// Defaults to "" set to null or "" to not have any suffix.
+		/// </summary>
+		string TableNameSuffix { get; set; }
+
+		/// <summary>
 		/// Whether to run the changes inside a database transaction.
 		/// </summary>
 		bool UseTransaction { get; set; }
+
+		/// <summary>
+		/// DB Schema for resulting generated DB objects
+		/// </summary>
+		string Schema { get; set; }
+
+		/// <summary>
+		/// Indicates if description fields should be generated with values read for each enum member decorated by <see cref="System.ComponentModel.DescriptionAttribute"/>
+		/// </summary>
+		bool GenerateDescription { get; set; }
+
+		/// <summary>
+		/// Indicates type of generated DB objects
+		/// </summary>
+		/// <remarks>
+		/// <para>When <see keyword="true"/> target DB objects are generated as tables with foreign key references in referencing tables.</para>
+		/// <para>When <see keyword="false"/> target DB objects are generated as views without foreign key references in referencing tables.</para>
+		/// <para>Default values is <see keyword="false"/></para>
+		/// </remarks>
+		bool GenerateViews { get; set; }
 	}
 }

@@ -11,6 +11,7 @@ namespace EfEnumToLookup.LookupGenerator
 	internal class EnumReference
 	{
 		public string ReferencingTable { get; set; }
+		public string ReferencingTableSchema { get; set; }
 		public string ReferencingField { get; set; }
 		public Type EnumType { get; set; }
 

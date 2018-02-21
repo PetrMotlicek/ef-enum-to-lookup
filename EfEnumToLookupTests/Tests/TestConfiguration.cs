@@ -1,4 +1,6 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
+using System.Data.SqlClient;
 using EfEnumToLookup.LookupGenerator;
 using EfEnumToLookupTests.Db;
 using EfEnumToLookupTests.Model;
@@ -41,6 +43,18 @@ namespace EfEnumToLookupTests.Tests
 			TestPrefixConfig(null, "select 1 from Ears");
 		}
 
+		[Test]
+		public void SetSchema()
+		{
+			TestSchemaConfig("testSchema", "select 1 from testSchema.Ears");
+		}
+
+		[Test]
+		public void FailedSqlWithoutSchema()
+		{
+			Assert.Catch<SqlException>(() => TestSchemaConfig("testSchema", "select 1 from Ears"));
+		}
+
 		private static void TestSuffixConfig(string tableNameSuffix, string testSql)
 		{
 			// arrange
@@ -51,12 +65,24 @@ namespace EfEnumToLookupTests.Tests
 			};
 			TestConfig(testSql, enumToLookup);
 		}
+
 		private static void TestPrefixConfig(string tableNamePrefix, string testSql)
 		{
 			// arrange
 			var enumToLookup = new EnumToLookup
 			{
 				TableNamePrefix = tableNamePrefix
+			};
+			TestConfig(testSql, enumToLookup);
+		}
+
+		private static void TestSchemaConfig(string schema, string testSql)
+		{
+			// arrange
+			var enumToLookup = new EnumToLookup
+			{
+				TableNamePrefix = null,
+				Schema = schema
 			};
 			TestConfig(testSql, enumToLookup);
 		}

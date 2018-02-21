@@ -30,6 +30,16 @@ namespace EfEnumToLookup.LookupGenerator
 		bool UseTransaction { get; set; }
 
 		/// <summary>
+		/// DB Schema for resulting generated DB objects
+		/// </summary>
+		string Schema { get; set; }
+
+		/// <summary>
+		/// Indicates if description fields should be generated with values read for each enum member decorated by <see cref="System.ComponentModel.DescriptionAttribute"/>
+		/// </summary>
+		bool GenerateDescription { get; set; }
+
+		/// <summary>
 		/// Make the required changes to the database.
 		/// </summary>
 		/// <param name="model">Details of lookups and foreign keys to add/update</param>
