@@ -25,6 +25,9 @@
 	{
 		private readonly EnumParser _enumParser;
 
+		/// <summary>
+		/// Constructor initializing things to default properties.
+		/// </summary>
 		public EnumToLookup()
 		{
 			// set default behaviour, can be overridden by setting properties on object before calling Apply()
@@ -71,6 +74,9 @@
 
 		/// <inheritdoc />
 		public string Schema { get; set; }
+
+		/// <inheritdoc />
+		public bool DoNotGenerateConstraints { get; set; }
 
 		/// <inheritdoc />
 		public bool GenerateDescription { get; set; }
@@ -136,6 +142,7 @@
 			dbHandler.UseTransaction = UseTransaction;
 			dbHandler.Schema = Schema;
 			dbHandler.GenerateDescription = GenerateDescription;
+			dbHandler.DoNotGenerateConstraints = DoNotGenerateConstraints;
 
 			return dbHandler;
 		}

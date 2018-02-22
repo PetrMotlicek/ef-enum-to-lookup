@@ -12,7 +12,7 @@ namespace EfEnumToLookupTests.Tests
 	[TestFixture]
 	public class TestStuffViews
 	{
-		private void Init(bool generateViews)
+		private void Init(bool generateViews, bool doNotGenerateConstraints = false)
 		{
 			// Cleanup after other test runs
 			// Using setup rather than teardown to make it easier to inspect the database after running a test.
@@ -31,6 +31,7 @@ namespace EfEnumToLookupTests.Tests
 				TableNamePrefix = null,
 				Schema = "enum",
 				SplitWords = false,
+				DoNotGenerateConstraints = doNotGenerateConstraints
 			}));
 		}
 
@@ -65,10 +66,10 @@ namespace EfEnumToLookupTests.Tests
 			}
 		}
 
-		[Test]
-		public void CheckConstraintNegativeTest()
+		[Test, TestCase(false), TestCase(true)]
+		public void CheckConstraintNegativeTest(bool doNotGenerateConstraints)
 		{
-			Init(true);
+			Init(true, doNotGenerateConstraints);
 
 
 			using (var context = new MagicContext())
@@ -83,7 +84,14 @@ namespace EfEnumToLookupTests.Tests
 
 
 				context.PeskyWabbits.Add(rabit1);
-				Assert.Catch<DbUpdateException>(() => context.SaveChanges());
+				if (doNotGenerateConstraints)
+				{
+					context.SaveChanges();
+				}
+				else
+				{
+					Assert.Catch<DbUpdateException>(() => context.SaveChanges());
+				}
 			}
 		}
 

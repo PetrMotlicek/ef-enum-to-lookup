@@ -54,6 +54,11 @@ namespace EfEnumToLookup.LookupGenerator
 		string Schema { get; set; }
 
 		/// <summary>
+		/// Switch for generating constraints on the enum fields (columns) .
+		/// </summary>
+		bool DoNotGenerateConstraints { get; set; }
+
+		/// <summary>
 		/// Indicates if description fields should be generated with values read for each enum member decorated by <see cref="System.ComponentModel.DescriptionAttribute"/>
 		/// </summary>
 		bool GenerateDescription { get; set; }

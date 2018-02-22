@@ -16,9 +16,15 @@
 			}
 
 			EnsureSchema(sql);
+			
 			sql.AppendLine(CreateTables(model.Lookups));
 			sql.AppendLine(PopulateLookups(model.Lookups));
-			sql.AppendLine(AddForeignKeys(model.References));
+
+			if (!DoNotGenerateConstraints)
+			{
+				sql.AppendLine(AddForeignKeys(model.References));
+			}
+
 			if (UseTransaction)
 			{
 				sql.AppendLine("commit;");

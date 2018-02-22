@@ -42,6 +42,9 @@ namespace EfEnumToLookup.LookupGenerator
 		public string Schema { get; set; }
 
 		/// <inheritdoc />
+		public bool DoNotGenerateConstraints { get; set; }
+
+		/// <inheritdoc />
 		public bool GenerateDescription { get; set; }
 
 		/// <summary>

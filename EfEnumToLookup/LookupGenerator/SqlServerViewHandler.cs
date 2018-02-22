@@ -20,7 +20,11 @@ namespace EfEnumToLookup.LookupGenerator
 
 			EnsureSchema(sql);
 			CreateViews(sql, model.Lookups);
-			AddCheckConstraints(sql, model.References, model.Lookups);
+
+			if (!DoNotGenerateConstraints)
+			{
+				AddCheckConstraints(sql, model.References, model.Lookups);
+			}
 
 			if (UseTransaction)
 			{
