@@ -9,8 +9,12 @@ Entity Framework 6.1 Enum Lookup Table Generator
 About
 -----
 
-Creates lookup tables and foreign key constraints based on the enums
-used in your model.
+Creates 
+	
+	a) lookup tables and foreign key constraints 
+	b) views and check constraints: [README-SCHEMA_VIEWS_CHECK_CONSTRAINTs.png](Screenshot)
+
+based on the enums used in your model.
 
 This makes up for a feature that's missing in Entity Framework 6.1.
 
