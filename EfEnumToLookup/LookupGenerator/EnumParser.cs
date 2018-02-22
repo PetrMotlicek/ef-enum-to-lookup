@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -116,8 +117,21 @@ namespace EfEnumToLookup.LookupGenerator
 
 			// https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value/1799401#1799401
 			var member = enumType.GetMember(value.ToString()).First();
-			var description = member.GetCustomAttributes(typeof(DescriptionAttribute)).FirstOrDefault() as DescriptionAttribute;
-			return description == null ? null : description.Description;
+			DescriptionAttribute description = (DescriptionAttribute)member.GetCustomAttributes(typeof(DescriptionAttribute)).FirstOrDefault();
+
+		    if (description != null)
+		    {
+		        return description.Description;
+		    }
+
+		    DisplayAttribute displayAttribute = (DisplayAttribute)member.GetCustomAttributes(typeof(DisplayAttribute)).FirstOrDefault();
+
+			if (displayAttribute != null)
+			{
+				return displayAttribute.ToString();
+			}
+
+			return null;
 		}
 
 		private static bool IsRuntimeOnly(Enum value)
