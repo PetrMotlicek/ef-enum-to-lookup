@@ -128,7 +128,7 @@ namespace EfEnumToLookup.LookupGenerator
 
 			if (displayAttribute != null)
 			{
-				return displayAttribute.ToString();
+				return displayAttribute.GetDescription() ?? displayAttribute.GetName() ?? displayAttribute.GetShortName();
 			}
 
 			return null;
