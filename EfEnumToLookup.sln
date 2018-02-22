@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfEnumToLookupTests", "EfEnumToLookupTests\EfEnumToLookupTests.csproj", "{DED8AB21-6D20-43F6-B9A7-522D63F34423}"
 EndProject
@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		ef-enum-to-lookup.nuspec = ef-enum-to-lookup.nuspec
+		README-SCHEMA_VIEWS_CHECK_CONSTRAINTs.png = README-SCHEMA_VIEWS_CHECK_CONSTRAINTs.png
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -37,5 +38,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8798398E-2997-4FE9-841B-99E1A29F1FA2}
 	EndGlobalSection
 EndGlobal

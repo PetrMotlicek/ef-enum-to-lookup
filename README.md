@@ -11,8 +11,8 @@ About
 
 Creates 
 	
-	a) lookup tables and foreign key constraints 
-	b) views and check constraints: [README-SCHEMA_VIEWS_CHECK_CONSTRAINTs.png](Screenshot)
+a) lookup tables and foreign key constraints
+b) views and check constraints: [Screenshot](README-SCHEMA_VIEWS_CHECK_CONSTRAINTs.png)
 
 based on the enums used in your model.
 
