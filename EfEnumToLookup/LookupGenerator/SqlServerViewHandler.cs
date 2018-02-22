@@ -82,8 +82,8 @@ namespace EfEnumToLookup.LookupGenerator
 			string description = GenerateDescription ? ", Description" : null;
 
 			string appendTuppleDelimiter = ", ";
-			string appendSelectDelimiter = "UNION";
 			string appendDelimiter = Environment.NewLine + "\t\t\t";
+			string appendSelectDelimiter = "UNION" + appendDelimiter;
 
 			Action<StringBuilder, LookupValue> appendTupleValue = GenerateDescription ? (Action<StringBuilder, LookupValue>)AppendValueTupleWithDescription : AppendValueTuple;
 			Action<StringBuilder, LookupValue> appendSelectValue = GenerateDescription ? (Action<StringBuilder, LookupValue>)AppendSelectValueWithDescription : AppendSelectValues;
