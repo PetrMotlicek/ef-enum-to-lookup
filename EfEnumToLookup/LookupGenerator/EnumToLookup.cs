@@ -123,7 +123,7 @@
 			IDbHandler dbHandler;
 			if (GenerateViews)
 			{
-				dbHandler = new SqlViewServerHandler();
+				dbHandler = new SqlServerViewHandler();
 			}
 			else
 			{

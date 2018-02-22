@@ -67,7 +67,7 @@
     <Compile Include="LookupGenerator\RuntimeOnlyAttribute.cs" />
     <Compile Include="LookupGenerator\SqlServerHandler.cs" />
     <Compile Include="LookupGenerator\SqlServerHandlerBase.cs" />
-    <Compile Include="LookupGenerator\SqlViewServerHandler.cs" />
+    <Compile Include="LookupGenerator\SqlServerViewHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerGenerationHelper.cs" />
   </ItemGroup>

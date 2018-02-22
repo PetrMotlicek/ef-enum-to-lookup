@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EfEnumToLookup.LookupGenerator
 {
-	class SqlViewServerHandler : SqlServerHandlerBase
+	class SqlServerViewHandler : SqlServerHandlerBase
 	{
 		/// <inheritdoc />
 		protected override string BuildSql(LookupDbModel model)
@@ -29,16 +29,18 @@ namespace EfEnumToLookup.LookupGenerator
 			return sql.ToString();
 		}
 
-		private static void ForEarchLookupValue(LookupData lookup, StringBuilder sb, string delimiter, Action<StringBuilder, LookupValue> singleEnumValueComposer)
+		private static void ForEarchLookupValue(LookupData lookup, StringBuilder sb, string indentation, string delimiter, Action<StringBuilder, LookupValue> singleEnumValueComposer)
 		{
 			using (IEnumerator<LookupValue> valueEnumerator = lookup.Values.GetEnumerator())
 			{
 				if (valueEnumerator.MoveNext())
 				{
+					sb.Append(indentation);
 					singleEnumValueComposer(sb, valueEnumerator.Current);
 
 					while (valueEnumerator.MoveNext())
 					{
+						sb.Append(indentation);
 						sb.Append(delimiter);
 						singleEnumValueComposer(sb, valueEnumerator.Current);
 					}
@@ -54,22 +56,22 @@ namespace EfEnumToLookup.LookupGenerator
 
 		private static void AppendValueTuple(StringBuilder sb, LookupValue lookupValue)
 		{
-			sb.AppendLine($"({lookupValue.Id},{lookupValue.Name.SanitizeExecuteSqlString()})");
+			sb.Append($"({lookupValue.Id}, {lookupValue.Name.SanitizeExecuteSqlString()})");
 		}
 
 		private static void AppendValueTupleWithDescription(StringBuilder sb, LookupValue lookupValue)
 		{
-			sb.AppendLine($"({lookupValue.Id},N''{lookupValue.Name.SanitizeExecuteSqlString()}'',{GetDescription(lookupValue)})");
+			sb.Append($"({lookupValue.Id}, N''{lookupValue.Name.SanitizeExecuteSqlString()}'', {GetDescription(lookupValue)})");
 		}
 
 		private static void AppendSelectValues(StringBuilder sb, LookupValue lookupValue)
 		{
-			sb.AppendLine($"SELECT {lookupValue.Id},N''{lookupValue.Name.SanitizeExecuteSqlString()}''");
+			sb.Append($"SELECT {lookupValue.Id}, N''{lookupValue.Name.SanitizeExecuteSqlString()}''");
 		}
 
 		private static void AppendSelectValueWithDescription(StringBuilder sb, LookupValue lookupValue)
 		{
-			sb.AppendLine($"SELECT {lookupValue.Id},N''{lookupValue.Name.SanitizeExecuteSqlString()}'',{GetDescription(lookupValue)}");
+			sb.Append($"SELECT {lookupValue.Id}, N''{lookupValue.Name.SanitizeExecuteSqlString()}'', {GetDescription(lookupValue)}");
 		}
 
 		private void CreateViews(StringBuilder sql, IEnumerable<LookupData> enums)
@@ -79,8 +81,9 @@ namespace EfEnumToLookup.LookupGenerator
 			string descriptionDefinition = GenerateDescription ? ", CAST(Description as nvarchar(max)) as Description" : null;
 			string description = GenerateDescription ? ", Description" : null;
 
-			string appendTuppleDelimiter = Environment.NewLine + "			, ";
-			string appendSelectDelimiter = Environment.NewLine + "			UNION " + Environment.NewLine + "			";
+			string appendTuppleDelimiter = ", ";
+			string appendSelectDelimiter = "UNION";
+			string appendDelimiter = Environment.NewLine + "\t\t\t";
 
 			Action<StringBuilder, LookupValue> appendTupleValue = GenerateDescription ? (Action<StringBuilder, LookupValue>)AppendValueTupleWithDescription : AppendValueTuple;
 			Action<StringBuilder, LookupValue> appendSelectValue = GenerateDescription ? (Action<StringBuilder, LookupValue>)AppendSelectValueWithDescription : AppendSelectValues;
@@ -93,20 +96,21 @@ namespace EfEnumToLookup.LookupGenerator
 
 				sql.AppendLine($"IF (OBJECT_ID('{schemaAndTableName}', 'V') IS NOT NULL) EXEC ('DROP VIEW {schemaWithBrackets}[{tableName}]')");
 				sql.AppendLine($"EXEC ('CREATE VIEW {schemaWithBrackets}[{tableName}] AS");
-				sql.AppendLine($"	SELECT CAST(Id as {idType}) as Id, CAST(Name as nvarchar({NameFieldLength:0})) as Name{descriptionDefinition}");
-				sql.AppendLine("	FROM (");
+				sql.AppendLine($"\tSELECT CAST(Id as {idType}) as Id, CAST(Name as nvarchar({NameFieldLength:0})) as Name{descriptionDefinition}");
+				sql.AppendLine("\tFROM (");
 
 				if (lookup.Values.Count <= 1000)
 				{
-					sql.AppendLine("		VALUES");
-					ForEarchLookupValue(lookup, sql, appendTuppleDelimiter, appendTupleValue);
+					sql.AppendLine("\t\tVALUES");
+					ForEarchLookupValue(lookup, sql, appendDelimiter, appendTuppleDelimiter, appendTupleValue);
 				}
 				else
 				{
-					ForEarchLookupValue(lookup, sql, appendSelectDelimiter, appendSelectValue);
+					ForEarchLookupValue(lookup, sql, appendDelimiter, appendSelectDelimiter, appendSelectValue);
 				}
 
-				sql.AppendLine($"	) as t(Id,Name{description})");
+				sql.AppendLine();
+				sql.AppendLine($"\t) as t(Id,Name{description})");
 				sql.AppendLine("');");
 
 				sql.AppendViewMetadataDescriptionLine(schema, tableName, DbObjectDescription);
