@@ -60,7 +60,7 @@ namespace EfEnumToLookup.LookupGenerator
 
 		private static void AppendValueTuple(StringBuilder sb, LookupValue lookupValue)
 		{
-			sb.Append($"({lookupValue.Id}, {lookupValue.Name.SanitizeExecuteSqlString()})");
+			sb.Append($"({lookupValue.Id}, N''{lookupValue.Name.SanitizeExecuteSqlString()}'')");
 		}
 
 		private static void AppendValueTupleWithDescription(StringBuilder sb, LookupValue lookupValue)
